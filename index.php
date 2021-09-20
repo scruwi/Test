@@ -22,7 +22,6 @@ $logger = new Logger('PageVisit');
 $logger->pushHandler(new StreamHandler(__DIR__ . '/logs/page_visit.log', Logger::DEBUG));
 
 // Init Messenger
-$handler = new PageVisitMessageHandler($logger);
 $bus = new MessageBus([
     new SendMessageMiddleware(new SendersLocator($logger, [
         CsvTransport::class => [
@@ -30,7 +29,9 @@ $bus = new MessageBus([
         ]
     ])),
     new HandleMessageMiddleware(new HandlersLocator([
-        PageVisitMessage::class => [$handler],
+        PageVisitMessage::class => [
+            new PageVisitMessageHandler($logger)
+        ],
     ])),
 ]);
 
