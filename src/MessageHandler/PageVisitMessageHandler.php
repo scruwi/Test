@@ -3,16 +3,20 @@
 namespace App\MessageHandler;
 
 use App\Message\PageVisitMessage;
-use Monolog\Logger;
-use Monolog\Handler\StreamHandler;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
 class PageVisitMessageHandler implements MessageHandlerInterface
 {
+    private LoggerInterface $logger;
+
+    public function __construct(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
     public function __invoke(PageVisitMessage $message)
     {
-        $log = new Logger('PageVisit');
-        $log->pushHandler(new StreamHandler(__DIR__.'/../../logs/page_visit.log', Logger::DEBUG));
-        $log->info($message->getContent());
+        $this->logger->info('Message was handled successfully: ' . $message->getContent());
     }
 }
