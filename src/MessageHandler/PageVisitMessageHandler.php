@@ -17,6 +17,6 @@ class PageVisitMessageHandler implements MessageHandlerInterface
 
     public function __invoke(PageVisitMessage $message)
     {
-        $this->logger->info($message->getContent());
+        $this->logger->info('Message was handled successfully: ' . $message->getContent());
     }
 }

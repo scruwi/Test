@@ -6,11 +6,14 @@ use App\Application\JsonResponse;
 use App\Controller\PageController;
 use App\Message\PageVisitMessage;
 use App\MessageHandler\PageVisitMessageHandler;
+use App\Messenger\CsvTransport;
+use App\Messenger\SendersLocator;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
+use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
 
 require_once 'vendor/autoload.php';
 
@@ -21,6 +24,11 @@ $logger->pushHandler(new StreamHandler(__DIR__ . '/logs/page_visit.log', Logger:
 // Init Messenger
 $handler = new PageVisitMessageHandler($logger);
 $bus = new MessageBus([
+    new SendMessageMiddleware(new SendersLocator($logger, [
+        CsvTransport::class => [
+            CsvTransport::CONFIG_PATH => __DIR__ . '/messages.csv',
+        ]
+    ])),
     new HandleMessageMiddleware(new HandlersLocator([
         PageVisitMessage::class => [$handler],
     ])),
