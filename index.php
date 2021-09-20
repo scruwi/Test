@@ -29,5 +29,7 @@ $index = new PageController($logger, $bus);
 
 try {
     echo $index->index();
-} catch (\JsonException $e) {
+} catch (\JsonException | \Throwable $e) {
+    $logger->error($e->getMessage());
+    echo 'Internal server error';
 }
