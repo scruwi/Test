@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Application\JsonResponse;
 use App\Message\PageVisitMessage;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -18,14 +19,11 @@ class PageController
         $this->messageBus = $messageBus;
     }
 
-    /**
-     * @throws \JsonException
-     */
-    public function index()
+    public function index(): JsonResponse
     {
         $this->messageBus->dispatch(new PageVisitMessage('New Message'));
         $this->logger->debug('Page index completed');
 
-        return json_encode('load', JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE);
+        return new JsonResponse('load');
     }
 }

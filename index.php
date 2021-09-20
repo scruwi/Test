@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Application\JsonResponse;
 use App\Controller\PageController;
 use App\Message\PageVisitMessage;
 use App\MessageHandler\PageVisitMessageHandler;
@@ -25,11 +26,28 @@ $bus = new MessageBus([
     ])),
 ]);
 
+// Routing
 $index = new PageController($logger, $bus);
 
 try {
-    echo $index->index();
-} catch (\JsonException | \Throwable $e) {
-    $logger->error($e->getMessage());
-    echo 'Internal server error';
+    $response = $index->index();
+} catch (\Throwable $e) {
+    $logger->error($e);
+    $response = new JsonResponse('Internal server error', 500);
 }
+
+// Serialization
+try {
+    $content = $response->getContent();
+    $contentType = 'application/json';
+    $status = $response->getStatus();
+} catch (\JsonException $e) {
+    $content = 'Invalid json format';
+    $contentType = 'text/html';
+    $status = 500;
+}
+
+// Send response
+http_response_code($status);
+header('Content-Type: ' . $contentType);
+echo $content;
